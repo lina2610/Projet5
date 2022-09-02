@@ -1,10 +1,10 @@
-// RECUPERRATION DES PRODUITS DU LOCALSTORAGE   //
+// RECUPERER LES PRODUITS STOCKES DANS LE LOCALSTORAGE   //
 let products = [];
 let productInLocalStorage = JSON.parse(localStorage.getItem("product"));
 
-// AFFICHAGE DES PRODUITS DU PANIER
+// AFFICHER LES PRODUITS DU PANIER
 
-// html concerné par la modification que l'on va utiliser
+// je sélectionne la partie html sur laquelle nous allons travailler
 let cartAndFormContainer = document.getElementById("cartAndFormContainer");
 
 // si le panier est vide : afficher 'le panier est vide'
@@ -14,7 +14,7 @@ if (productInLocalStorage === null || productInLocalStorage == 0) {
     <p>Votre panier est vide ! <br> Merci de sélectionner des produits depuis la page d'accueil</p>
   </div>`;
 }
-// si le panier contient un ou des produits : affichage des produits dans le localStorage
+// si le panier n'est pas vide : afficher les produits dans le localStorage
 else {
   let itemCards = [];
 
@@ -24,7 +24,9 @@ else {
 
     // le code suivant sera injecté à chaque tour de boucle
     // selon la longueur des produits dans le local storage
-    itemCards += `
+    itemCards =
+      itemCards +
+      `
     
     <article class="cart__item" data-id="${productInLocalStorage[i].id}" data-color="${productInLocalStorage.color}">
     <div class="cart__item__img">
@@ -54,15 +56,16 @@ else {
     itemCart.innerHTML += itemCards;
   }
 
-  // modif quantité panier en utilisant addEventListener de type change
+  // modif quantité dans le panier
   function changeQtt() {
-    let itemQuantity = document.querySelectorAll(".itemQuantity");
-    for (let j = 0; j < itemQuantity.length; j++) {
-      itemQuantity[j].addEventListener("change", (event) => {
+    let itemQtt = document.querySelectorAll(".itemQuantity");
+    for (let j = 0; j < itemQtt.length; j++) {
+      itemQtt[j].addEventListener("change", (event) => {
         event.preventDefault();
-        //  nouvelle quantité va être sauvegardée dans un nouveau tableau
+        // sélection de la nouvelle quantité...
+        // ... qu'on va sauvegarder dans un nouveau tableau
         // avec les autres éléments du localStorage
-        let itemNewQtt = itemQuantity[j].value;
+        let itemNewQtt = itemQtt[j].value;
         const newLocalStorage = {
           id: productInLocalStorage[j].id,
           image: productInLocalStorage[j].image,
@@ -78,7 +81,7 @@ else {
         // ...en transformant les Js en Json
         localStorage.setItem("product", JSON.stringify(productInLocalStorage));
 
-        // alerte de modif +  mise à jour total
+        // avertir de la modification et mettre à jour les totaux
         alert("Votre panier est à jour.");
         totalArticles();
         priceAmount();
@@ -154,14 +157,73 @@ else {
   priceAmount();
 } // fin else : s'il y a des produits dans le panier
 
-// formulaire coordonnées du client//
+// FORMULAIRE //
 
-const contact = {
-  firstName: document.getElementById("firstName"),
-  lastName: document.getElementById("lastName"),
-  address: document.getElementById("address"),
-  city: document.getElementById("city"),
-  email: document.getElementById("email"),
-};
+// envoi des données saisies au serveur//
 
-//contrôle des données saisies par le client et affichade message erreur //
+function postForm() {
+  const order = document.getElementById("order");
+  order.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    //Création d'une constante contenant l'ensemble des données du formulaire //
+
+    const contact = {
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      address: document.getElementById("address").value,
+      city: document.getElementById("city").value,
+      email: document.getElementById("email").value,
+    };
+
+    //vérification de l'adresse mail saisie et affichage si besoin d'un message d'erreur//
+
+    function controlEmail() {
+      const validEmail = contact.email;
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(validEmail)) {
+        return true;
+      } else {
+        let emailErrorMsg = document.getElementById("emailErrorMsg");
+        emailErrorMsg.innerText = "Erreur ! Email non valide";
+      }
+    }
+    // une fois le mail vérifié, envoi des données du formulaire dans le localstorage en utilisation setItem//
+
+    function validControl() {
+      if (controlEmail()) {
+        localStorage.setItem("contact", JSON.stringify(contact));
+        return true;
+      } else {
+        alert("merci de vérifier les données saisies");
+      }
+    }
+    validControl();
+
+    //création d'un objet qui contient les données de contact et les produits du panier//
+
+    const sendFormData = {
+      products,
+      contact,
+    };
+
+    //envoyer l'object comprenant les données de contact  et les produits du panier vers le serveur avec la méthode POST //
+
+    const options = {
+      method: "POST",
+      body: JSON.stringify(sendFormData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    fetch("http://localhost:3000/api/products/order", options)
+      .then((response) => response.json())
+      .then((data) => {
+        localStorage.setItem("orderId", data.orderId);
+        if (validControl()) {
+          document.location.href = "confirmation.html?id=" + data.orderId;
+        }
+      });
+  }); // fin eventListener postForm
+} // fin envoi du formulaire postForm
+postForm();
