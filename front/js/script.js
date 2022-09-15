@@ -1,6 +1,4 @@
 // fetch pour récupérer les canapés et les afficher sur la page d'accueil
-// appel à l'API contenant les canapés
-// dans un premier temps on les récupère
 
 let articleFetch = function () {
   fetch("http://localhost:3000/api/products")
@@ -13,11 +11,11 @@ let articleFetch = function () {
 
       // dans un second temps on affiche sur la page les canapés que l'on a récupéré avec l'id contenu dans le code HTML
       // on sélectionne avec getelementbyId l'élément sur lequel on travaille
-      let productSection = document.getElementById("items");
+      let itemSection = document.getElementById("items");
 
       // utilisation de for : ajout des canapés tant qu'il y en a
       for (i = 0; i < data.length; i++) {
-        const productCard = `
+        const itemCard = `
           <a href="./product.html?id=${data[i]._id}">
             <article>
               <img
@@ -31,7 +29,7 @@ let articleFetch = function () {
             </article>
           </a>
         `;
-        productSection.innerHTML += productCard;
+        itemSection.innerHTML += itemCard;
       }
     });
 };

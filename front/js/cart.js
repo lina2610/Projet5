@@ -11,10 +11,10 @@ let cartAndFormContainer = document.getElementById("cartAndFormContainer");
 if (productInLocalStorage === null || productInLocalStorage == 0) {
   document.querySelector("#cart__items").innerHTML = `
   <div class="cart__empty">
-    <p>Votre panier est vide ! <br> Merci de sélectionner des produits depuis la page d'accueil</p>
+    <p>Votre panier est vide !</p>
   </div>`;
 }
-// si le panier n'est pas vide : afficher les produits dans le localStorage
+// si le panier n'est pas vide : afficher les produits qui sont dans le localStorage
 else {
   let itemCards = [];
 
@@ -56,15 +56,17 @@ else {
     itemCart.innerHTML += itemCards;
   }
 
+  // ON MODIFIE LE PANIER : MODIF DE QUANTITE
+
   // modif quantité dans le panier
   function changeQtt() {
     let itemQtt = document.querySelectorAll(".itemQuantity");
     for (let j = 0; j < itemQtt.length; j++) {
       itemQtt[j].addEventListener("change", (event) => {
         event.preventDefault();
-        // sélection de la nouvelle quantité...
-        // ... qu'on va sauvegarder dans un nouveau tableau
-        // avec les autres éléments du localStorage
+
+        // sélection de la nouvelle quantité, dans un nouveau tableau
+
         let itemNewQtt = itemQtt[j].value;
         const newLocalStorage = {
           id: productInLocalStorage[j].id,
@@ -73,15 +75,15 @@ else {
           name: productInLocalStorage[j].name,
           color: productInLocalStorage[j].color,
           price: productInLocalStorage[j].price,
-          quantity: itemNewQtt, // avec la nouvelle quantité souhaitée
+          quantity: itemNewQtt,
         };
 
         // actualiser le localStorage avec les nouvelles données récupérées...
         productInLocalStorage[j] = newLocalStorage;
-        // ...en transformant les Js en Json
+
         localStorage.setItem("product", JSON.stringify(productInLocalStorage));
 
-        // avertir de la modification et mettre à jour les totaux
+        // mettre à jour total du panier
         alert("Votre panier est à jour.");
         totalArticles();
         priceAmount();
@@ -90,7 +92,9 @@ else {
   }
   changeQtt();
 
-  // je supprime un produit dans le panier
+  // ON SUPPRIME UN PRODUIT DANS LE PANIER
+
+  // On utilise la fonction deleteArticle
   function deleteArticle() {
     const deleteItem = document.querySelectorAll(".deleteItem");
 
@@ -108,23 +112,24 @@ else {
           (elt) => elt.id !== deleteId || elt.color !== deleteColor
         );
 
-        // envoyer les nouvelles données dans le localStorage
+        // on envoie les nouvelles données dans le localStorage de la même manière que précédemment
         localStorage.setItem("product", JSON.stringify(productInLocalStorage));
 
-        // avertir de la suppression et recharger la page
-        alert("Votre article a bien été supprimé.");
+        // recharger la page
         window.location.href = "cart.html";
+        alert("Votre article a bien été supprimé.");
       });
     }
   }
   deleteArticle();
 
-  // j'affiche le total des articles dans le panier
+  // AFFICHAGE DU TOTAL
+
   function totalArticles() {
     let totalItems = 0;
     for (l in productInLocalStorage) {
-      // analyser et convertir la valeur 'quantité' dans le localstorage en une chaîne
-      // et renvoie un entier (parseInteger), sur la base décimale de 10
+      // analyser et convertir la valeur 'quantité' dans le localstorage
+
       const newQuantity = parseInt(productInLocalStorage[l].quantity, 10);
 
       // attribuer la valeur retournée par parseInt à la variable totalItems
@@ -140,7 +145,7 @@ else {
   function priceAmount() {
     const calculPrice = [];
     for (m = 0; m < productInLocalStorage.length; m++) {
-      // prix de l'article quantité * prix
+      // le prix de l'article équivaut à quantité * prix
       const cartAmount =
         productInLocalStorage[m].price * productInLocalStorage[m].quantity;
       calculPrice.push(cartAmount);
@@ -157,7 +162,7 @@ else {
   priceAmount();
 } // fin else : s'il y a des produits dans le panier
 
-// FORMULAIRE //
+// FORMULAIRE de saisie de données du client  //
 
 // envoi des données saisies au serveur//
 
@@ -176,7 +181,43 @@ function postForm() {
       email: document.getElementById("email").value,
     };
 
-    //vérification de l'adresse mail saisie et affichage si besoin d'un message d'erreur//
+    //vérification des données saisies dans le formulaire et affichage si besoin d'un message d'erreur//
+
+    //contrôle prénom
+    function controlFirstName() {
+      const validFirstName = contact.firstName;
+      if (/^[a-z][a-z '-.,]{1,31}$|^$/i.test(validFirstName)) {
+        return true;
+      } else {
+        let firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+        firstNameErrorMsg.innerText =
+          "Merci de vérifier le prénom, 3 caractères minimum";
+      }
+    }
+
+    // contrôle nom
+    function controlName() {
+      const validName = contact.lastName;
+      if (/^[a-z][a-z '-.,]{1,31}$|^$/i.test(validName)) {
+        return true;
+      } else {
+        let lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+        lastNameErrorMsg.innerText =
+          "Merci de vérifier le nom, 3 caractères minimum, avec des lettres uniquement";
+      }
+    }
+
+    // contrôle ville
+    function controlCity() {
+      const validAddress = contact.city;
+      if (/^[a-z][a-z '-.,]{1,31}$|^$/i.test(validAddress)) {
+        return true;
+      } else {
+        let cityErrorMsg = document.getElementById("cityErrorMsg");
+        cityErrorMsg.innerText =
+          "Merci de vérifier le nom de la ville, 3 caractères minimum, avec des lettres uniquement";
+      }
+    }
 
     function controlEmail() {
       const validEmail = contact.email;
@@ -187,14 +228,19 @@ function postForm() {
         emailErrorMsg.innerText = "Erreur ! Email non valide";
       }
     }
-    // une fois le mail vérifié, envoi des données du formulaire dans le localstorage en utilisation setItem//
 
+    // Après vérification des entrées, j'envoie l'objet contact dans le localStorage
     function validControl() {
-      if (controlEmail()) {
+      if (
+        controlFirstName() &&
+        controlName() &&
+        controlCity() &&
+        controlEmail()
+      ) {
         localStorage.setItem("contact", JSON.stringify(contact));
         return true;
       } else {
-        alert("merci de vérifier les données saisies");
+        alert("Merci de vérifir les données saisies");
       }
     }
     validControl();
