@@ -1,9 +1,14 @@
-// grâce à la fonction searchParams on va récupérer l'ID de chaque produit
+//---------JE REDIRIGE L'URL DE L'API---------
 
+// je crée une nouvelle url à partir de l'url actuelle
+// et en ajoutant searchParams pour manipuler les paramètres de requête d'URL :
 let params = new URL(window.location.href).searchParams;
+// j'indique que la nouvelle url sera ajoutée d'un id :
 let newID = params.get("id");
 
-//sélection des éléments sur lesquels on intervient avec getElementById
+//---------J'APPELLE DE NOUVEAU L'API AVEC L'ID DU CANAPE CHOISI---------
+
+// je crée les variables dont j'ai besoin pour manipuler cette page :
 const image = document.getElementsByClassName("item__img");
 const title = document.getElementById("title");
 const price = document.getElementById("price");
@@ -13,7 +18,7 @@ const colors = document.getElementById("colors");
 let imageURL = "";
 let imageAlt = "";
 
-// création d'une URL pour chaque produit sélectionné grâce à l'ID récupéré
+// je crée la bonne URL pour chaque produit choisi en ajoutant newID
 fetch("http://localhost:3000/api/products/" + newID)
   .then((res) => res.json())
   .then((data) => {
@@ -25,7 +30,7 @@ fetch("http://localhost:3000/api/products/" + newID)
     price.innerText = `${data.price}`;
     description.innerText = `${data.description}`;
 
-    // choix des couleurs
+    // je configure le choix des couleurs
     for (number in data.colors) {
       colors.options[colors.options.length] = new Option(
         data.colors[number],
@@ -33,17 +38,19 @@ fetch("http://localhost:3000/api/products/" + newID)
       );
     }
   })
-  //  le serveur ne répond pas
+  // j'ajoute un message au cas où le serveur ne répond pas
   .catch((_error) => {
-    alert(" Le serveur ne répond pas");
+    alert(
+      "Oops ! Le serveur ne répond pas, suivez les instructions dans le READ.me."
+    );
   });
 
-// récupération des données suite au choix du client
+//---------JE RECUPERE LES DONNEES PAR RAPPORT AU CHOIX DE L'UTILISATEUR---------
 
 const selectQuantity = document.getElementById("quantity");
 const selectColors = document.getElementById("colors");
 
-// eventListener lorsque client ajoute un article au panier
+// je configure un eventListener quand l'utilisateur clique sur ajouter au panier
 const addToCart = document.getElementById("addToCart");
 addToCart.addEventListener("click", (event) => {
   event.preventDefault();
@@ -58,19 +65,25 @@ addToCart.addEventListener("click", (event) => {
     quantity: selectQuantity.value,
   };
 
+  // je déclare une variable productInLocalStorage
+  // dans laquelle je mets les clés+valeurs dans le local storage
+  // JSON.parse permet de convertir les données au format JSON en objet JavaScript
   let productInLocalStorage = JSON.parse(localStorage.getItem("product"));
 
-  // ajout des produits sélectionnés dans le localStorage
+  // j'ajoute les produits sélectionnés dans le localStorage
   const addProductLocalStorage = () => {
-    // récupération de la sélection de l'utilisateur dans le tableau de l'objet :
+    // je récupère la sélection de l'utilisateur dans le tableau de l'objet :
+    // on peut voir dans la console qu'il y a les données,
+    // mais pas encore stockées dans le storage à ce stade
 
     productInLocalStorage.push(selection);
-    // stockage des données dans le local storage,
-    // avec la fonction setItem(clé,valeur) on enregistre les valeurs dans le local storage
+    // je stocke les données récupérées dans le localStorage :
+    // JSON.stringify permet de convertir les données au format JavaScript en JSON
+    // vérifier que key et value dans l'inspecteur contiennent bien des données
     localStorage.setItem("product", JSON.stringify(productInLocalStorage));
   };
 
-  //  message qui indique que le produit est ajouté au panier
+  // je crée une boîte de dialogue pour confirmer l'ajout au panier
   let addConfirm = () => {
     alert("Le produit a bien été ajouté au panier");
   };
@@ -100,7 +113,7 @@ addToCart.addEventListener("click", (event) => {
 
   // s'il n'y a aucun produit enregistré dans le localStorage
   else {
-    // tableau avec les produits choisis par l'utilisateur
+    // je crée alors un tableau avec les éléments choisi par l'utilisateur
     productInLocalStorage = [];
     addProductLocalStorage();
     addConfirm();

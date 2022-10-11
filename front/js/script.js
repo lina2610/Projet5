@@ -2,15 +2,12 @@
 
 let articleFetch = function () {
   fetch("http://localhost:3000/api/products")
-    //promesse n°1 qui va récupérer la réponse et la transformer en .JSON pour faciliter la lecture par navigateur
     .then((response) => response.json())
-
-    // promesse n°2 qui va afficher les données obtenues précédemment
     .then((data) => {
       console.log(data);
 
       // dans un second temps on affiche sur la page les canapés que l'on a récupéré avec l'id contenu dans le code HTML
-      // on sélectionne avec getelementbyId l'élément sur lequel on travaille
+      // avec getelementbyId l'élément sur lequel on travaille
       let itemSection = document.getElementById("items");
 
       // utilisation de for : ajout des canapés tant qu'il y en a
@@ -33,4 +30,4 @@ let articleFetch = function () {
       }
     });
 };
-articleFetch(); // fin du fetch
+articleFetch();
