@@ -43,7 +43,7 @@ fetch("http://localhost:3000/api/products/")
     else {
       let itemCards = [];
 
-      // expression initiale; condition; incrémentation
+      incrémentation;
       for (i = 0; i < productInLocalStorage.length; i++) {
         products.push(productInLocalStorage[i].id);
 
@@ -81,7 +81,7 @@ fetch("http://localhost:3000/api/products/")
         itemCart.innerHTML += itemCards;
       }
 
-      // je modifie la quantité dans le panier
+      // modification de la quantité dans le panier
       function changeQtt() {
         let itemQtt = document.querySelectorAll(".itemQuantity");
         for (let j = 0; j < itemQtt.length; j++) {
@@ -99,7 +99,7 @@ fetch("http://localhost:3000/api/products/")
               color: productInLocalStorage[j].color,
               price: getPriceById(productInLocalStorage[j].id),
               //productInLocalStorage[j].price,
-              quantity: itemNewQtt, // avec la nouvelle quantité souhaitée
+              quantity: itemNewQtt,
             };
 
             // actualiser le localStorage avec les nouvelles données récupérées...
@@ -120,7 +120,7 @@ fetch("http://localhost:3000/api/products/")
       }
       changeQtt();
 
-      // je supprime un produit dans le panier
+      // supprime un produit dans le panier
       function deleteArticle() {
         const deleteItem = document.querySelectorAll(".deleteItem");
 
@@ -133,7 +133,7 @@ fetch("http://localhost:3000/api/products/")
             let deleteColor = productInLocalStorage[k].color;
 
             // filtrer l'élément cliqué par le bouton supprimer
-            // en respectant les conditions du callback
+
             productInLocalStorage = productInLocalStorage.filter(
               (elt) => elt.id !== deleteId || elt.color !== deleteColor
             );
@@ -168,7 +168,7 @@ fetch("http://localhost:3000/api/products/")
       }
       totalArticles();
 
-      // calcule le montant total du panier
+      // montant total du panier
       function priceAmount() {
         const calculPrice = [];
         for (m = 0; m < productInLocalStorage.length; m++) {
@@ -208,7 +208,7 @@ fetch("http://localhost:3000/api/products/")
         };
 
         ////
-        // --- vérifier la validation des entrées --- //
+        // --- formulaire //
         ////
 
         //contrôle prénom
@@ -278,9 +278,6 @@ fetch("http://localhost:3000/api/products/")
             emailErrorMsg.innerText = "Email non valide";
           }
         }
-        ////
-        // --- FIN vérifier la validation des entrées --- //
-        ////
 
         // Après vérification des entrées, j'envoie l'objet contact dans le localStorage
         function validControl() {
