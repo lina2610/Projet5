@@ -43,7 +43,7 @@ fetch("http://localhost:3000/api/products/")
     else {
       let itemCards = [];
 
-      incrémentation;
+      //incrémentation
       for (i = 0; i < productInLocalStorage.length; i++) {
         products.push(productInLocalStorage[i].id);
 
